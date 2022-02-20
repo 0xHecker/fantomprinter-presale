@@ -1,0 +1,17 @@
+{
+  "name": "connectmetamask-f7",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@metamask/detect-provider": "^1.2.0",
+    "ethers": "^5.5.4",
+    "web3": "^1.7.0"
+  }
+}
