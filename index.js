@@ -43,7 +43,7 @@ function showAddress() {
 
     document.getElementById(
         "userAddress"
-    ).innerText = `Address: ${truncateAddress(window.userAddress)}`;
+    ).innerText = `${truncateAddress(window.userAddress)}`;
     getEthBalance();
     getMimBalance();
 }
