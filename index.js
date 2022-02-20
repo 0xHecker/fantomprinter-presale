@@ -276,7 +276,7 @@ async function buy() {
         .then(receipt => { console.log(receipt) });
 }
 
-document.getElementById("buyBtn").addEventListener("click", function(event) {
+document.getElementById("buy Btn ").addEventListener("click", function(event) {
     event.preventDefault();
 
     const contract = new window.web3.eth.Contract(
