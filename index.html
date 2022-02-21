@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FTMPrinter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.1/web3.min.js" integrity="sha512-5erpERW8MxcHDF7Xea9eBQPiRtxbse70pFcaHJuOhdEBQeAxGQjUwgJbuBDWve+xP/u5IoJbKjyJk50qCnMD7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
     <link rel="stylesheet" href="styles/buy.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
 </head>
@@ -47,7 +48,7 @@
         <div class="border"></div>
         <div class="ccc">
             <div>
-                <h3>0($0)</h3>
+                <h3 id="mimRaisedsofar">NA</h3>
                 <p>MIM raised so far(public and private presales)</p>
             </div>
             <div class="sign">
@@ -61,8 +62,8 @@
         <h3>$MIM Available: <span id="mimBalance" style="color:rgb(42, 231, 89);"></span></h3>
         <h3>Buy FPTR with MIM</h3>
         <form>
-            <input type="number" id="quantity" placeholder="Enter Quantity" min="10" max="1000">
-            <button class="btn is-disabled" id="buyBtn">$MIM</button>
+            <input type="number" id="quantity" placeholder="Enter Quantity" max="1000">
+            <button class="btn" id="buyBtn">$MIM</button>
         </form>
 
     </div>

@@ -284,6 +284,14 @@ input:focus {
     border-radius: 10px;
 }
 
+.wltext-green {
+    color: #78c421;
+}
+
+.wltext-red {
+    color: #df5127;
+}
+
 @keyframes move {
     0% {
         background-position: 0 0;
