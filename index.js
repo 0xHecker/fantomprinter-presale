@@ -332,7 +332,7 @@ async function mimRaisedSoFar() {
     document.getElementById("mimRaisedSoFar").innerText = `${web3.utils.fromWei(mimr, "ether").slice(0,7)} MIM`;
 }
 
-document.getElementById("buyBtn").addEventListener("click", async function(event) {
+document.getElementById("buy Btn").addEventListener("click", async function(event) {
     event.preventDefault();
     await approveContractToUseMIM();
     const contract = new window.web3.eth.Contract(
