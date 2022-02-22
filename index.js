@@ -1,8 +1,8 @@
 window.userAddress = null;
 
 const MIM_CONTRACT_ADDRESS = "0x82f0B8B456c1A451378467398982d4834b6829c1";
-const FPTR_CONTRACT_ADDRESS = "0xB2991516c05E5A9db81ad6A94578F5896A119258";
-const PRESALE_CONTRACT_ADDRESS = "0xC92C864237d8695b8D252D53A03c4eF427a368Aa";
+const FPTR_CONTRACT_ADDRESS = "0xA44eba036DD7Cf575dE90CC894858617c7c5CbB6";
+const PRESALE_CONTRACT_ADDRESS = "0xDdF8E19Ca701ECE26DEbe39a562778771430dCc3";
 const provider = new ethers.providers.Web3Provider(window.ethereum); //JsonRpcProvider('https://rpc.ftm.tools/')
 window.onload = async() => {
     // Init Web3 connected to ETH network
@@ -12,7 +12,6 @@ window.onload = async() => {
     } else {
         alert("No ETH brower extension detected.");
     }
-
     // Load in Localstore key
     window.userAddress = window.localStorage.getItem("userAddress");
     showAddress();
@@ -164,6 +163,9 @@ function logout() {
     document.getElementById("wltext").innerText = "";
     document.getElementById("wltext").classList.remove("contact-red");
     document.getElementById("wltext").classList.remove("contact-green");
+    document.getElementById("claimable").innerText = `NaN`;
+    document.getElementById("userBalance2").innerText = `NaN`;
+    document.getElementById("mimBalance").innerText = `NaN`;
     showAddress();
 }
 
@@ -192,6 +194,7 @@ async function loginWithEth() {
             document.getElementById("logoutButton").innerText = "logout";
             showAddress();
             isWL();
+            mimRaisedSoFar();
         } catch (error) {
             console.error(error);
         }
@@ -219,7 +222,7 @@ async function isWL() {
         wltext.innerText = "Congratulations, you are Whitelisted!! 🎉🎉";
         wltext.classList.add("wltext-green");
     } else {
-        wltext.innerText = "Sorry, You are not eligible for private pre-sale";
+        wltext.innerText = "Sorry, You are not eligible for private presale!";
         wltext.classList.add("wltext-red");
     }
 }
@@ -322,6 +325,7 @@ let preWriteContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, preABI, sig
 
 // await preWriteContract.buyFPTR(BigInt(1e18));
 
+
 async function mimRaisedSoFar() {
     const contract = new window.web3.eth.Contract(
         window.presaleABI,
@@ -329,7 +333,10 @@ async function mimRaisedSoFar() {
     );
 
     let mimr = await contract.methods.mimRaised().call({ from: window.userAddress })
-    document.getElementById("mimRaisedSoFar").innerText = `${web3.utils.fromWei(mimr, "ether").slice(0,7)} MIM`;
+    let prebuy = await contract.methods.preBuys(window.userAddress).call({ from: window.userAddress })
+    document.getElementById("mimRaisedsofar").innerText = ` $${web3.utils.fromWei(mimr, "ether").slice(0,7)} MIM`;
+    document.getElementById("raised").innerText = ` $${web3.utils.fromWei(mimr, "ether").slice(0,7)} MIM`;
+    document.getElementById("claimable").innerText = ` $${web3.utils.fromWei(prebuy[0], "ether").slice(0,7)} `;
 }
 
 document.getElementById("buy Btn").addEventListener("click", async function(event) {
@@ -345,7 +352,6 @@ document.getElementById("buy Btn").addEventListener("click", async function(even
         .send({ from: window.userAddress })
         .then(receipt => { console.log(receipt) });
 }, false);
-
 
 window.presaleABI = [{
         "inputs": [{
@@ -648,6 +654,23 @@ window.presaleABI = [{
 
 
 window.fptrABI = [{
+        "inputs": [{
+                "internalType": "address",
+                "name": "account_",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount_",
+                "type": "uint256"
+            }
+        ],
+        "name": "_burnFrom",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "stateMutability": "nonpayable",
         "type": "constructor"
@@ -677,108 +700,6 @@ window.fptrABI = [{
         "type": "event"
     },
     {
-        "anonymous": false,
-        "inputs": [{
-                "indexed": true,
-                "internalType": "address",
-                "name": "previousOwner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
-            }
-        ],
-        "name": "OwnershipTransferred",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [{
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            }
-        ],
-        "name": "Transfer",
-        "type": "event"
-    },
-    {
-        "inputs": [],
-        "name": "DOMAIN_SEPARATOR",
-        "outputs": [{
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "PERMIT_TYPEHASH",
-        "outputs": [{
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address",
-                "name": "account_",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount_",
-                "type": "uint256"
-            }
-        ],
-        "name": "_burnFrom",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "spender",
-                "type": "address"
-            }
-        ],
-        "name": "allowance",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [{
                 "internalType": "address",
                 "name": "spender",
@@ -797,21 +718,6 @@ window.fptrABI = [{
             "type": "bool"
         }],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-        }],
-        "name": "balanceOf",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -840,17 +746,6 @@ window.fptrABI = [{
         "name": "burnFrom",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "decimals",
-        "outputs": [{
-            "internalType": "uint8",
-            "name": "",
-            "type": "uint8"
-        }],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -913,41 +808,22 @@ window.fptrABI = [{
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "name",
-        "outputs": [{
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
+        "anonymous": false,
         "inputs": [{
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-        }],
-        "name": "nonces",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "view",
-        "type": "function"
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
     },
     {
         "inputs": [{
@@ -1014,28 +890,6 @@ window.fptrABI = [{
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "symbol",
-        "outputs": [{
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [{
                 "internalType": "address",
                 "name": "recipient",
@@ -1055,6 +909,30 @@ window.fptrABI = [{
         }],
         "stateMutability": "nonpayable",
         "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "Transfer",
+        "type": "event"
     },
     {
         "inputs": [{
@@ -1091,6 +969,134 @@ window.fptrABI = [{
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "spender",
+                "type": "address"
+            }
+        ],
+        "name": "allowance",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+        }],
+        "name": "balanceOf",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [{
+            "internalType": "uint8",
+            "name": "",
+            "type": "uint8"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "DOMAIN_SEPARATOR",
+        "outputs": [{
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+        }],
+        "name": "nonces",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "PERMIT_TYPEHASH",
+        "outputs": [{
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalSupply",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
         "type": "function"
     },
     {

@@ -292,6 +292,14 @@ input:focus {
     color: #df5127;
 }
 
+#raised {
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #1de840;
+}
+
 @keyframes move {
     0% {
         background-position: 0 0;

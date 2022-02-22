@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FTMPrinter</title>
+    <title>Fantom Printer Presale</title>
+    <link rel="icon" type="image/x-icon" href="/images/mainlogo.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.1/web3.min.js" integrity="sha512-5erpERW8MxcHDF7Xea9eBQPiRtxbse70pFcaHJuOhdEBQeAxGQjUwgJbuBDWve+xP/u5IoJbKjyJk50qCnMD7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
     <link rel="stylesheet" href="styles/buy.css" />
@@ -19,7 +20,7 @@
             <label for="check" class="menu-btn">
                 <i class="fas fa-bars"></i>
             </label>
-            <a href="dashboard.html" class="logo"><img src="images/mainlogo.png"></a>
+            <a href="/" class="logo"><img src="images/mainlogo.png"></a>
 
             <ul class="navlinks">
                 <!-- <li><a href="#" class="link">Buy</a></li>
@@ -41,7 +42,7 @@
     <div class="details">
         <h2 id="wltext"></h2>
         <h2>PreSale Disabled</h2>
-        <p>We have raised $000000 during the private presale and $000,000.00 during the public one.</p>
+        <p>We have raised <span id="raised">NaN</span> during the private presale</p>
         <p>For Private Presale: 1 $FPTR = 0.01 MIM</p>
 
         <a href="https://fantomprinter.gitbook.io">> See more explanation on our docs</a>
@@ -49,7 +50,7 @@
         <div class="ccc">
             <div>
                 <h3 id="mimRaisedsofar">NA</h3>
-                <p>MIM raised so far(public and private presales)</p>
+                <p>MIM raised so far (In private presale)</p>
             </div>
             <div class="sign">
                 <span class="fast-flicker" id="demo"></span>
@@ -58,8 +59,9 @@
     </div>
     <div class="quantity">
         <h3>Your Balances : </h3>
-        <h5>$FTM Available: <span id="userBalance2" style="color:rgb(42, 231, 89);"></span></h5>
-        <h3>$MIM Available: <span id="mimBalance" style="color:rgb(42, 231, 89);"></span></h3>
+        <h5>$FTM Available: <span id="userBalance2" style="color:rgb(42, 231, 89);">NaN</span></h5>
+        <h5>$MIM contribured: <span id="claimable" style="color:rgb(42, 231, 89);">NaN</span></h5>
+        <h3>$MIM Available: <span id="mimBalance" style="color:rgb(42, 231, 89);">NaN</span></h3>
         <h3>Buy FPTR with MIM</h3>
         <form>
             <input type="number" id="quantity" placeholder="Enter Quantity" max="1000">
