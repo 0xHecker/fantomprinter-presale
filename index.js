@@ -349,7 +349,7 @@ document.getElementById("buyBtn").addEventListener("click", async function(event
 
     let amount = document.getElementById("quantity").value;
     amount = parseInt(amount);
-    if (amount < 99) {
+    if (amount < 95) {
         amount = amount + 100000000;
     } else {
         await contract.methods.buyFPTR(BigInt(amount * 1e18))
