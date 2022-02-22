@@ -1,8 +1,8 @@
 window.userAddress = null;
 
 const MIM_CONTRACT_ADDRESS = "0x82f0B8B456c1A451378467398982d4834b6829c1";
-const FPTR_CONTRACT_ADDRESS = "0xA44eba036DD7Cf575dE90CC894858617c7c5CbB6";
-const PRESALE_CONTRACT_ADDRESS = "0xDdF8E19Ca701ECE26DEbe39a562778771430dCc3";
+const FPTR_CONTRACT_ADDRESS = "0xe39c2233A68561291Fbf597433d4a9A1D219Ddbe";
+const PRESALE_CONTRACT_ADDRESS = "0xDa73D3695407e61D95A56C07A56AA4F80c53773C";
 const provider = new ethers.providers.Web3Provider(window.ethereum); //JsonRpcProvider('https://rpc.ftm.tools/')
 window.onload = async() => {
     // Init Web3 connected to ETH network
@@ -339,7 +339,7 @@ async function mimRaisedSoFar() {
     document.getElementById("claimable").innerText = ` $${web3.utils.fromWei(prebuy[0], "ether").slice(0,7)} `;
 }
 
-document.getElementById("buy Btn").addEventListener("click", async function(event) {
+document.getElementById("buyBtn").addEventListener("click", async function(event) {
     event.preventDefault();
     await approveContractToUseMIM();
     const contract = new window.web3.eth.Contract(
@@ -354,6 +354,55 @@ document.getElementById("buy Btn").addEventListener("click", async function(even
 }, false);
 
 window.presaleABI = [{
+        "inputs": [{
+                "internalType": "address",
+                "name": "_wl",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isWl",
+                "type": "bool"
+            }
+        ],
+        "name": "addWhitelisted",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "_amount",
+            "type": "uint256"
+        }],
+        "name": "buyFPTR",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "redeemFPTR",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "retreiveExcessFptr",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "retreiveMim",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [{
                 "internalType": "uint256",
                 "name": "_rate",
@@ -421,56 +470,6 @@ window.presaleABI = [{
         ],
         "name": "TokenPurchase",
         "type": "event"
-    },
-    {
-        "inputs": [],
-        "name": "RATE_DECIMALS",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "VESTING_TIME_DECIMALS",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address",
-                "name": "_wl",
-                "type": "address"
-            },
-            {
-                "internalType": "bool",
-                "name": "_isWl",
-                "type": "bool"
-            }
-        ],
-        "name": "addWhitelisted",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "uint256",
-            "name": "_amount",
-            "type": "uint256"
-        }],
-        "name": "buyFPTR",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
     },
     {
         "inputs": [],
@@ -583,23 +582,13 @@ window.presaleABI = [{
     },
     {
         "inputs": [],
-        "name": "redeemFPTR",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "retreiveExcessFptr",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "retreiveMim",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "name": "RATE_DECIMALS",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -616,6 +605,17 @@ window.presaleABI = [{
     {
         "inputs": [],
         "name": "vestedTime",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "VESTING_TIME_DECIMALS",
         "outputs": [{
             "internalType": "uint256",
             "name": "",
@@ -651,7 +651,6 @@ window.presaleABI = [{
         "type": "function"
     }
 ];
-
 
 window.fptrABI = [{
         "inputs": [{
