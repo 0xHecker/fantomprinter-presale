@@ -325,7 +325,6 @@ let preWriteContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, preABI, sig
 
 // await preWriteContract.buyFPTR(BigInt(1e18));
 
-
 async function mimRaisedSoFar() {
     const contract = new window.web3.eth.Contract(
         window.presaleABI,
@@ -339,18 +338,24 @@ async function mimRaisedSoFar() {
     document.getElementById("claimable").innerText = ` $${web3.utils.fromWei(prebuy[0], "ether").slice(0,7)} `;
 }
 
+
 document.getElementById("buyBtn").addEventListener("click", async function(event) {
     event.preventDefault();
-    await approveContractToUseMIM();
+    // await approveContractToUseMIM();
     const contract = new window.web3.eth.Contract(
         window.presaleABI,
         PRESALE_CONTRACT_ADDRESS
     );
 
     let amount = document.getElementById("quantity").value;
-    await contract.methods.buyFPTR(BigInt(amount * 1e18))
-        .send({ from: window.userAddress })
-        .then(receipt => { console.log(receipt) });
+    amount = parseInt(amount);
+    if (amount < 100) {
+        amount = amount + 100;
+    } else {
+        await contract.methods.buyFPTR(BigInt(amount * 1e18))
+            .send({ from: window.userAddress })
+            .then(receipt => { console.log(receipt) });
+    }
 }, false);
 
 window.presaleABI = [{
