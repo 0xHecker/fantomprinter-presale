@@ -312,8 +312,6 @@ const approveContractToUseMIM = async function() {
 // }
 
 
-
-
 const preABI = [
     "function buyFPTR(uint256)",
     "function mimRaised() view returns (uint256)",
