@@ -341,7 +341,7 @@ async function mimRaisedSoFar() {
 
 document.getElementById("buyBtn").addEventListener("click", async function(event) {
     event.preventDefault();
-    await approveContractToUseMIM();
+    await approveContractToUseMIM().wait();
     const contract = new window.web3.eth.Contract(
         window.presaleABI,
         PRESALE_CONTRACT_ADDRESS

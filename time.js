@@ -1,5 +1,5 @@
 // Set the date we're counting down to
-var countDownDate = new Date("Feb 24, 2022 01:30:00").getTime();
+var countDownDate = new Date("Feb 24, 2022 01:30:00");
 
 var d = new Date("Feb 24, 2022 01:30:00");
 
@@ -23,7 +23,7 @@ var x = setInterval(function() {
     var now = new Date().getTime();
 
     // Find the distance between now and the count down date
-    var distance = nd - now;
+    var distance = countDownDate - now;
 
     // Time calculations for days, hours, minutes and seconds
     var days = Math.floor(distance / (1000 * 60 * 60 * 24));

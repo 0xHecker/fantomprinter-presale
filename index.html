@@ -60,12 +60,12 @@
     <div class="quantity">
         <h3>Your Balances : </h3>
         <h5>$FTM Available: <span id="userBalance2" style="color:rgb(42, 231, 89);">NaN</span></h5>
-        <h5>$MIM contribured: <span id="claimable" style="color:rgb(42, 231, 89);">NaN</span></h5>
+        <h5>$MIM contributed: <span id="claimable" style="color:rgb(42, 231, 89);">NaN</span></h5>
         <h3>$MIM Available: <span id="mimBalance" style="color:rgb(42, 231, 89);">NaN</span></h3>
         <h3>Buy FPTR with MIM</h3>
         <form>
-            <input type="number" id="quantity" placeholder="Enter Quantity (Min = $100, Max = $1000)" max="1000">
-            <button class="btn" id="buyBtn">$MIM</button>
+            <input type="number" id="quantity" placeholder="Enter Quantity (Min = $100, Max = $1000)" min="100" max="1000">
+            <button type="submit" class="btn" id="buyBtn">$MIM</button>
         </form>
 
     </div>
