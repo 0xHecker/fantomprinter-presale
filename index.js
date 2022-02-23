@@ -351,7 +351,7 @@ async function mimRaisedSoFar() {
     let prebuy = await contract.methods.preBuys(window.userAddress).call({ from: window.userAddress })
     let publicbuy = await contract2.methods.preBuys(window.userAddress).call({ from: window.userAddress })
 
-    document.getElementById("mimRaisedsofar").innerText = ` $${web3.utils.fromWei(mimr+mimr2, "ether").slice(0,7)} MIM`;
+    document.getElementById("mimRaisedsofar").innerText = ` $${web3.utils.fromWei(mimr, "ether").slice(0,7)} + ${web3.utils.fromWei(mimr2, "ether").slice(0,7)}  MIM`;
     document.getElementById("raised").innerText = ` $${web3.utils.fromWei(mimr2, "ether").slice(0,7)} MIM`;
     document.getElementById("claimable").innerText = ` $${web3.utils.fromWei(prebuy[0], "ether").slice(0,7)} `;
     document.getElementById("claimable2").innerText = ` $${web3.utils.fromWei(publicbuy[0], "ether").slice(0,7)} `;
