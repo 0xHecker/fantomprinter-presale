@@ -3,6 +3,7 @@ window.userAddress = null;
 const MIM_CONTRACT_ADDRESS = "0x82f0B8B456c1A451378467398982d4834b6829c1";
 const FPTR_CONTRACT_ADDRESS = "0xe39c2233A68561291Fbf597433d4a9A1D219Ddbe";
 const PRESALE_CONTRACT_ADDRESS = "0xDa73D3695407e61D95A56C07A56AA4F80c53773C";
+const PUBLICSALE_CONTRACT_ADDRESS = "0xc9C9eCE77cb39F0Ecd2ac028bF859dd08D596Fa0"
 const provider = new ethers.providers.Web3Provider(window.ethereum); //JsonRpcProvider('https://rpc.ftm.tools/')
 window.onload = async() => {
     // Init Web3 connected to ETH network
@@ -271,8 +272,8 @@ async function isWL() {
 
 async function buy() {
     const contract = new window.web3.eth.Contract(
-        window.presaleABI,
-        PRESALE_CONTRACT_ADDRESS
+        window.publicsaleABI,
+        PUBLICSALE_CONTRACT_ADDRESS
     );
 
     let amount = document.getElementById("quantity").value;
@@ -304,6 +305,16 @@ const approveContractToUseMIM = async function() {
     )
 }
 
+const approveContract2ToUseMIM = async function() {
+    let mimReadcontract = new ethers.Contract(MIM_CONTRACT_ADDRESS, mimAbi, provider);
+
+    let mimWritecontract = new ethers.Contract(MIM_CONTRACT_ADDRESS, mimAbi, signer);
+    await mimWritecontract.approve(
+        PUBLICSALE_CONTRACT_ADDRESS,
+        BigInt(1000000e18)
+    )
+}
+
 // const sendMIMtoContract = async function() {
 //     await writecontract.transfer(
 //         PRESALE_CONTRACT_ADDRESS,
@@ -329,23 +340,33 @@ async function mimRaisedSoFar() {
         PRESALE_CONTRACT_ADDRESS
     );
 
+    const contract2 = new window.web3.eth.Contract(
+        window.publicsaleABI,
+        PUBLICSALE_CONTRACT_ADDRESS
+    );
+
     let mimr = await contract.methods.mimRaised().call({ from: window.userAddress })
+    let mimr2 = await contract2.methods.mimRaised().call({ from: window.userAddress })
+
     let prebuy = await contract.methods.preBuys(window.userAddress).call({ from: window.userAddress })
-    document.getElementById("mimRaisedsofar").innerText = ` $${web3.utils.fromWei(mimr, "ether").slice(0,7)} MIM`;
-    document.getElementById("raised").innerText = ` $${web3.utils.fromWei(mimr, "ether").slice(0,7)} MIM`;
+    let publicbuy = await contract2.methods.preBuys(window.userAddress).call({ from: window.userAddress })
+
+    document.getElementById("mimRaisedsofar").innerText = ` $${web3.utils.fromWei(mimr+mimr2, "ether").slice(0,7)} MIM`;
+    document.getElementById("raised").innerText = ` $${web3.utils.fromWei(mimr2, "ether").slice(0,7)} MIM`;
     document.getElementById("claimable").innerText = ` $${web3.utils.fromWei(prebuy[0], "ether").slice(0,7)} `;
+    document.getElementById("claimable2").innerText = ` $${web3.utils.fromWei(publicbuy[0], "ether").slice(0,7)} `;
 }
 
 document.getElementById("approveContract").addEventListener("click", function(event) {
     event.preventDefault();
-    approveContractToUseMIM();
+    approveContract2ToUseMIM();
 });
 
 document.getElementById("buyBtn").addEventListener("click", async function(event) {
     event.preventDefault();
     const contract = new window.web3.eth.Contract(
-        window.presaleABI,
-        PRESALE_CONTRACT_ADDRESS
+        window.publicsaleABI,
+        PUBLICSALE_CONTRACT_ADDRESS
     );
 
     let amount = document.getElementById("quantity").value;
@@ -357,6 +378,8 @@ document.getElementById("buyBtn").addEventListener("click", async function(event
         .send({ from: window.userAddress })
         .then(receipt => { console.log(receipt) });
 }, false);
+
+window.publicsaleABI = [{ "inputs": [{ "internalType": "uint256", "name": "_rate", "type": "uint256" }, { "internalType": "address", "name": "_wallet", "type": "address" }, { "internalType": "contract ERC20", "name": "_mim", "type": "address" }, { "internalType": "contract ERC20", "name": "_fptr", "type": "address" }, { "internalType": "uint256", "name": "_openingTime", "type": "uint256" }, { "internalType": "uint256", "name": "_closingTime", "type": "uint256" }, { "internalType": "uint256", "name": "_vestedTime", "type": "uint256" }, { "internalType": "uint256", "name": "_minMimPerBuyer", "type": "uint256" }], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "purchaser", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "MimAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "FPTRAmount", "type": "uint256" }], "name": "TokenPurchase", "type": "event" }, { "inputs": [], "name": "RATE_DECIMALS", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "VESTING_TIME_DECIMALS", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "buyFPTR", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "closingTime", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "fptr", "outputs": [{ "internalType": "contract ERC20", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getPercentReleased", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "mim", "outputs": [{ "internalType": "contract ERC20", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "mimRaised", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "minMimPerBuyer", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "openingTime", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "preBuys", "outputs": [{ "internalType": "uint256", "name": "mimAmount", "type": "uint256" }, { "internalType": "uint256", "name": "fptrClaimedAmount", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "rate", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "redeemFPTR", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "retreiveExcessFptr", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "retreiveMim", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "totalFptrAmountToDistribute", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "vestedTime", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "wallet", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }];
 
 window.presaleABI = [{
         "inputs": [{
