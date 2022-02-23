@@ -160,9 +160,9 @@ function logout() {
     document.getElementById("logoutButton").classList.remove("contact-red");
     document.getElementById("logoutButton").innerText = '';
     document.getElementById("logoutButton").classList.add("hidden");
-    document.getElementById("wltext").innerText = "";
-    document.getElementById("wltext").classList.remove("contact-red");
-    document.getElementById("wltext").classList.remove("contact-green");
+    // document.getElementById("wltext").innerText = "";
+    // document.getElementById("wltext").classList.remove("contact-red");
+    // document.getElementById("wltext").classList.remove("contact-green");
     document.getElementById("claimable").innerText = `NaN`;
     document.getElementById("userBalance2").innerText = `NaN`;
     document.getElementById("mimBalance").innerText = `NaN`;
