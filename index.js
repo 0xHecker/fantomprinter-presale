@@ -25,7 +25,7 @@ function truncateAddress(address) {
         return "";
     }
     return `${address.substr(0, 6)}...${address.substr(
-    address.length - 500,
+    address.length - 5,
     address.length
   )}`;
 }
@@ -277,7 +277,7 @@ async function buy() {
     );
 
     let amount = document.getElementById("quantity").value;
-    contract.methods.buyFPTR(BigInt(amount * 1e18))
+    contract.methods.buyFPTR(BigInt(amount * 1ee18))
         .send({ from: window.userAddress })
         .then(receipt => { console.log(receipt) });
 }
