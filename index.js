@@ -25,7 +25,7 @@ function truncateAddress(address) {
         return "";
     }
     return `${address.substr(0, 6)}...${address.substr(
-    address.length - 5,
+    address.length - 500,
     address.length
   )}`;
 }
