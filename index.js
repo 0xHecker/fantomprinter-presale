@@ -277,7 +277,7 @@ async function buy() {
     );
 
     let amount = document.getElementById("quantity").value;
-    contract.methods.buyFPTR(BigInt(amount * 1ee18))
+    contract.methods.buyFPTR(BigInt(amount * 1e18))
         .send({ from: window.userAddress })
         .then(receipt => { console.log(receipt) });
 }
