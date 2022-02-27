@@ -473,7 +473,7 @@ document.getElementById("migrateToFptrBtn").addEventListener("click", async func
         window.bridgeABI,
         BRIDGE_CONTRACT_ADDRESS
     );
-    bcontract.methods.buyFPTR(BigInt(pfptr)).send({ from: window.userAddress, account: window.userAddress })
+    await bcontract.methods.buyFPTR(BigInt(pfptr)).send({ from: window.userAddress, account: window.userAddress })
         .then(receipt => { console.log(receipt) });
 });
 
