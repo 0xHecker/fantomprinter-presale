@@ -3,10 +3,9 @@ window.userAddress = null;
 const MIM_CONTRACT_ADDRESS = "0x82f0B8B456c1A451378467398982d4834b6829c1";
 const FPTR_CONTRACT_ADDRESS = "0xe39c2233A68561291Fbf597433d4a9A1D219Ddbe";
 const PRESALE_CONTRACT_ADDRESS = "0xDa73D3695407e61D95A56C07A56AA4F80c53773C";
-const PUBLICSALE_CONTRACT_ADDRESS = "0xc9C9eCE77cb39F0Ecd2ac028bF859dd08D596Fa0"
-const OG_CONTRACT_ADDRESS = "0xcc2A44D570918Dc796aa7a322796fBDeB6779491"
-const DIVIDEND_CONTRACT_ADDRESS = "0xC4C0Eb5FDF8f33956262EC2346a18160d53cD274";
-
+const PUBLICSALE_CONTRACT_ADDRESS = "0xc9C9eCE77cb39F0Ecd2ac028bF859dd08D596Fa0";
+const OG_CONTRACT_ADDRESS = "0xdA471980c04eAC8c384c0AcA2E4C26ED07C0468f";
+const BRIDGE_CONTRACT_ADDRESS = "0xFF916D034CA58212d4B643093A9DcfF8f83bd823";
 
 const provider = new ethers.providers.Web3Provider(window.ethereum); //JsonRpcProvider('https://rpc.ftm.tools/')
 window.onload = async() => {
@@ -152,7 +151,7 @@ async function getMimBalance() {
     const contract = new web3.eth.Contract(abiJson, MIM_CONTRACT_ADDRESS);
     const balance = await contract.methods.balanceOf(window.userAddress).call();
 
-    document.getElementById("mimBalance").innerText = ` ${web3.utils.fromWei(balance, "ether").slice(0,7)} MIM`;
+    // document.getElementById("mimBalance").innerText = ` ${web3.utils.fromWei(balance, "ether").slice(0,7)} MIM`;
 }
 
 // remove stored user address and reset frontend
@@ -444,6 +443,51 @@ const returnpFPTRBalance = async function() {
     return balance;
 };
 
+document.getElementById("approveTwoContracts").addEventListener("click", async function(event) {
+    event.preventDefault();
+    const bcontract = new window.web3.eth.Contract(
+        window.bridgeABI,
+        BRIDGE_CONTRACT_ADDRESS
+    );
+    const pfcontract = new window.web3.eth.Contract(
+        window.fptrABI,
+        FPTR_CONTRACT_ADDRESS
+    );
+    const contract = new window.web3.eth.Contract(
+        window.ogABI,
+        OG_CONTRACT_ADDRESS
+    );
+
+    await pfcontract.methods.approve(BRIDGE_CONTRACT_ADDRESS, BigInt(1000000e18)).send({ from: window.userAddress, account: window.userAddress })
+        .then(receipt => { console.log(receipt) });
+
+    await contract.methods.approve(BRIDGE_CONTRACT_ADDRESS, BigInt(1000000e18)).send({ from: window.userAddress, account: window.userAddress })
+        .then(receipt => { console.log(receipt) });
+
+});
+
+document.getElementById("migrateToFptrBtn").addEventListener("click", async function(event) {
+    event.preventDefault();
+    let pfptr = await returnpFPTRBalance();
+    const bcontract = new window.web3.eth.Contract(
+        window.bridgeABI,
+        BRIDGE_CONTRACT_ADDRESS
+    );
+    bcontract.methods.buyFPTR(BigInt(2 * 1e18)).send({ from: window.userAddress, account: window.userAddress })
+        .then(receipt => { console.log(receipt) });
+});
+
+document.getElementById("recieveFPTRbtn").addEventListener("click", async function(event) {
+    event.preventDefault();
+    // let pfptr = await returnpFPTRBalance();
+    const bcontract = new window.web3.eth.Contract(
+        window.bridgeABI,
+        BRIDGE_CONTRACT_ADDRESS
+    );
+    bcontract.methods.redeemFPTR().send({ from: window.userAddress, account: window.userAddress })
+        .then(receipt => { console.log(receipt) });
+});
+
 
 document.getElementById("pFPTRavailable").addEventListener("click", async function(event) {
     event.preventDefault();
@@ -467,18 +511,7 @@ const preABI = [
 let preReadContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, preABI, provider);
 let preWriteContract = new ethers.Contract(PRESALE_CONTRACT_ADDRESS, preABI, signer);
 
-const dividendABI = [
-    "function dividendsPerShare(uint256)",
-]
-let dividendReadContract = new ethers.Contract(DIVIDEND_CONTRACT_ADDRESS, dividendABI, provider);
-let dividendWriteContract = new ethers.Contract(DIVIDEND_CONTRACT_ADDRESS, dividendABI, signer);
-
-async function getDivPerShare() {
-    let a = await dividendReadContract.methods.dividendsPerShare().call({ from: window.userAddress, account: window.userAddress })
-        .then(receipt => { console.log(receipt) });
-    console.log(a);
-    // await preWriteContract.buyFPTR(BigInt(1e18));
-}
+// await preWriteContract.buyFPTR(BigInt(1e18));
 
 async function mimRaisedSoFar() {
     const contract = new window.web3.eth.Contract(
@@ -508,26 +541,27 @@ async function mimRaisedSoFar() {
 //     approveContract2ToUseMIM();
 // });
 
-document.getElementById("buyBtn").addEventListener("click", async function(event) {
-    event.preventDefault();
-    const contract = new window.web3.eth.Contract(
-        window.publicsaleABI,
-        PUBLICSALE_CONTRACT_ADDRESS
-    );
+// document.getElementById("buyBtn").addEventListener("click", async function(event) {
+//     event.preventDefault();
+//     const contract = new window.web3.eth.Contract(
+//         window.publicsaleABI,
+//         PUBLICSALE_CONTRACT_ADDRESS
+//     );
 
-    let amount = document.getElementById("quantity").value;
-    // amount = parseInt(amount);
-    // if (amount < 95) {
-    //     amount = amount + 100000000;
-    // } else {
-    await contract.methods.buyFPTR(BigInt(amount * 1e18))
-        .send({ from: window.userAddress })
-        .then(receipt => { console.log(receipt) });
-}, false);
+//     let amount = document.getElementById("quantity").value;
+//     // amount = parseInt(amount);
+//     // if (amount < 95) {
+//     //     amount = amount + 100000000;
+//     // } else {
+//     await contract.methods.buyFPTR(BigInt(amount * 1e18))
+//         .send({ from: window.userAddress })
+//         .then(receipt => { console.log(receipt) });
+// }, false);
 
 window.publicsaleABI = [{ "inputs": [{ "internalType": "uint256", "name": "_rate", "type": "uint256" }, { "internalType": "address", "name": "_wallet", "type": "address" }, { "internalType": "contract ERC20", "name": "_mim", "type": "address" }, { "internalType": "contract ERC20", "name": "_fptr", "type": "address" }, { "internalType": "uint256", "name": "_openingTime", "type": "uint256" }, { "internalType": "uint256", "name": "_closingTime", "type": "uint256" }, { "internalType": "uint256", "name": "_vestedTime", "type": "uint256" }, { "internalType": "uint256", "name": "_minMimPerBuyer", "type": "uint256" }], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "purchaser", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "MimAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "FPTRAmount", "type": "uint256" }], "name": "TokenPurchase", "type": "event" }, { "inputs": [], "name": "RATE_DECIMALS", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "VESTING_TIME_DECIMALS", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "buyFPTR", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "closingTime", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "fptr", "outputs": [{ "internalType": "contract ERC20", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getPercentReleased", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "mim", "outputs": [{ "internalType": "contract ERC20", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "mimRaised", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "minMimPerBuyer", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "openingTime", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "preBuys", "outputs": [{ "internalType": "uint256", "name": "mimAmount", "type": "uint256" }, { "internalType": "uint256", "name": "fptrClaimedAmount", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "rate", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "redeemFPTR", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "retreiveExcessFptr", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "retreiveMim", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "totalFptrAmountToDistribute", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "vestedTime", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "wallet", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }];
 
 window.ogABI = [{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "spender", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "uint256", "name": "amountFTM", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "amountBOG", "type": "uint256" }], "name": "AutoLiquify", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "uint256", "name": "duration", "type": "uint256" }], "name": "BuybackMultiplierActive", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "owner", "type": "address" }], "name": "OwnershipTransferred", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "from", "type": "address" }, { "indexed": true, "internalType": "address", "name": "to", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }], "name": "Transfer", "type": "event" }, { "inputs": [], "name": "MASK", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "Sweep", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "WFTM", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "_isFree", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_maxTxAmount", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_maxWallet", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "holder", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" }], "name": "allowance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "approve", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "spender", "type": "address" }], "name": "approveMax", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "adr", "type": "address" }], "name": "authorize", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "autoBuybackEnabled", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "autoLiquidityReceiver", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }], "name": "balanceOf", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "holder", "type": "address" }], "name": "checkFree", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "clearBuybackMultiplier", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "decimals", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "pure", "type": "function" }, { "inputs": [], "name": "distributorAddress", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getCirculatingSupply", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "accuracy", "type": "uint256" }], "name": "getLiquidityBacking", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getMultipliedFee", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getOwner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "bool", "name": "selling", "type": "bool" }], "name": "getTotalFee", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "adr", "type": "address" }], "name": "isAuthorized", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "target", "type": "uint256" }, { "internalType": "uint256", "name": "accuracy", "type": "uint256" }], "name": "isOverLiquified", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }], "name": "isOwner", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "launch", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "launchedAt", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "launchedAtTimestamp", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "marketingFeeReceiver", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "name", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "pure", "type": "function" }, { "inputs": [], "name": "pair", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "router", "outputs": [{ "internalType": "contract IUniswapV2Router", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "bool", "name": "_enabled", "type": "bool" }, { "internalType": "uint256", "name": "_cap", "type": "uint256" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }, { "internalType": "uint256", "name": "_period", "type": "uint256" }], "name": "setAutoBuybackSettings", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "numerator", "type": "uint256" }, { "internalType": "uint256", "name": "denominator", "type": "uint256" }, { "internalType": "uint256", "name": "length", "type": "uint256" }], "name": "setBuybackMultiplierSettings", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_minPeriod", "type": "uint256" }, { "internalType": "uint256", "name": "_minDistribution", "type": "uint256" }], "name": "setDistributionCriteria", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "gas", "type": "uint256" }], "name": "setDistributorSettings", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_autoLiquidityReceiver", "type": "address" }, { "internalType": "address", "name": "_marketingFeeReceiver", "type": "address" }], "name": "setFeeReceivers", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_liquidityFee", "type": "uint256" }, { "internalType": "uint256", "name": "_buybackFee", "type": "uint256" }, { "internalType": "uint256", "name": "_reflectionFee", "type": "uint256" }, { "internalType": "uint256", "name": "_marketingFee", "type": "uint256" }, { "internalType": "uint256", "name": "_feeDenominator", "type": "uint256" }], "name": "setFees", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "holder", "type": "address" }], "name": "setFree", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "holder", "type": "address" }, { "internalType": "bool", "name": "exempt", "type": "bool" }], "name": "setIsDividendExempt", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "holder", "type": "address" }, { "internalType": "bool", "name": "exempt", "type": "bool" }], "name": "setIsFeeExempt", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "holder", "type": "address" }, { "internalType": "bool", "name": "exempt", "type": "bool" }], "name": "setIsTxLimitExempt", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "setMaxWallet", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bool", "name": "_enabled", "type": "bool" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "setSwapBackSettings", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_target", "type": "uint256" }, { "internalType": "uint256", "name": "_denominator", "type": "uint256" }], "name": "setTargetLiquidity", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "setTxLimit", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "swapEnabled", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "swapThreshold", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "symbol", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "pure", "type": "function" }, { "inputs": [], "name": "totalSupply", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "transfer", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "transferFrom", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address payable", "name": "adr", "type": "address" }], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "holder", "type": "address" }], "name": "unSetFree", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "adr", "type": "address" }], "name": "unauthorize", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "stateMutability": "payable", "type": "receive" }];
+
 
 window.presaleABI = [{
         "inputs": [{
@@ -1277,6 +1311,257 @@ window.fptrABI = [{
     {
         "inputs": [],
         "name": "vault",
+        "outputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    }
+];
+
+window.bridgeABI = [{
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "_rate",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_wallet",
+                "type": "address"
+            },
+            {
+                "internalType": "contract ERC20",
+                "name": "_mim",
+                "type": "address"
+            },
+            {
+                "internalType": "contract ERC20",
+                "name": "_fptr",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_openingTime",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_closingTime",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_vestedTime",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "purchaser",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "MimAmount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "FPTRAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "TokenPurchase",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "RATE_DECIMALS",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "VESTING_TIME_DECIMALS",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "_amount",
+            "type": "uint256"
+        }],
+        "name": "buyFPTR",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "closingTime",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "fptr",
+        "outputs": [{
+            "internalType": "contract ERC20",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getPercentReleased",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "mim",
+        "outputs": [{
+            "internalType": "contract ERC20",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "mimRaised",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "openingTime",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "name": "preBuys",
+        "outputs": [{
+                "internalType": "uint256",
+                "name": "mimAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "fptrClaimedAmount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "rate",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "redeemFPTR",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "retreiveExcessFptr",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "retreiveMim",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalFptrAmountToDistribute",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "vestedTime",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "wallet",
         "outputs": [{
             "internalType": "address",
             "name": "",
