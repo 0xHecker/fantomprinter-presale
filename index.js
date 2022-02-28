@@ -466,33 +466,33 @@ document.getElementById("approveTwoContracts").addEventListener("click", async f
         .then(receipt => { console.log(receipt) });
 });
 
-document.getElementById("migrateToFptrBtn").addEventListener("click", async function(event) {
-    event.preventDefault();
-    let pfptr = await returnpFPTRBalance();
-    const bcontract = new window.web3.eth.Contract(
-        window.bridgeABI,
-        BRIDGE_CONTRACT_ADDRESS
-    );
-    await bcontract.methods.buyFPTR(BigInt(pfptr)).send({ from: window.userAddress, account: window.userAddress })
-        .then(receipt => { console.log(receipt) });
-});
+// document.getElementById("migrateToFptrBtn").addEventListener("click", async function(event) {
+//     event.preventDefault();
+//     let pfptr = await returnpFPTRBalance();
+//     const bcontract = new window.web3.eth.Contract(
+//         window.bridgeABI,
+//         BRIDGE_CONTRACT_ADDRESS
+//     );
+//     await bcontract.methods.buyFPTR(BigInt(pfptr)).send({ from: window.userAddress, account: window.userAddress })
+//         .then(receipt => { console.log(receipt) });
+// });
 
-document.getElementById("recieveFPTRbtn").addEventListener("click", async function(event) {
-    event.preventDefault();
-    // let pfptr = await returnpFPTRBalance();
-    const bcontract = new window.web3.eth.Contract(
-        window.bridgeABI,
-        BRIDGE_CONTRACT_ADDRESS
-    );
-    bcontract.methods.redeemFPTR().send({ from: window.userAddress, account: window.userAddress })
-        .then(receipt => { console.log(receipt) });
-});
+// document.getElementById("recieveFPTRbtn").addEventListener("click", async function(event) {
+//     event.preventDefault();
+//     // let pfptr = await returnpFPTRBalance();
+//     const bcontract = new window.web3.eth.Contract(
+//         window.bridgeABI,
+//         BRIDGE_CONTRACT_ADDRESS
+//     );
+//     bcontract.methods.redeemFPTR().send({ from: window.userAddress, account: window.userAddress })
+//         .then(receipt => { console.log(receipt) });
+// });
 
 
-document.getElementById("pFPTRavailable").addEventListener("click", async function(event) {
-    event.preventDefault();
-    checkpFPTRBalance();
-});
+// document.getElementById("pFPTRavailable").addEventListener("click", async function(event) {
+//     event.preventDefault();
+//     checkpFPTRBalance();
+// });
 
 // const sendMIMtoContract = async function() {
 //     await writecontract.transfer(
